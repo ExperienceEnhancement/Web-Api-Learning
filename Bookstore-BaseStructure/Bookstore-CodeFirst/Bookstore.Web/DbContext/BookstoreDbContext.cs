@@ -36,6 +36,11 @@ namespace Bookstore.Web.DbContext
                 .HasMany(x => x.Availabilities)
                 .WithRequired(x => x.Publisher)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Book>()
+                .HasMany(x => x.Reviews)
+                .WithRequired(x => x.Book)
+                .WillCascadeOnDelete(true);
         }
     }
 }

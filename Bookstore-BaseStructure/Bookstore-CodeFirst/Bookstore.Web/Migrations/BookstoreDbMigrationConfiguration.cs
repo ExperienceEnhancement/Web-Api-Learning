@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Bookstore.Models;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-
-namespace Bookstore.Web.Migrations
+﻿namespace Bookstore.Web.Migrations
 {
+    using System;
+    using System.Collections.Generic;
     using System.Data.Entity.Migrations;
+    using System.Linq;
 
+    using Bookstore.Models;
+    using Microsoft.AspNet.Identity;
+    using Microsoft.AspNet.Identity.EntityFramework;
+   
     using DbContext;
 
     public class BookstoreDbMigrationConfiguration
@@ -26,6 +26,7 @@ namespace Bookstore.Web.Migrations
             {
                 this.CreateUsers(context);
                 this.CreateBooks(context);
+                this.CreateReviews(context);
             }   
         }
 
@@ -102,6 +103,23 @@ namespace Bookstore.Web.Migrations
 
             conntext.Books.Add(theSecondHalfBook);
             conntext.SaveChanges();
+        }
+
+        private void CreateReviews(BookstoreDbContext context)
+        {
+            var books = context.Books.ToList();
+            foreach (var book in books)
+            {
+                context.Reviews.Add(new Review()
+                    {
+                        Book = book,
+                        User = context.Users.First(),
+                        Comment = "I love the book " + book.Title,
+                        Rate = DateTime.Now.Second + 5
+                    });
+            }
+
+            context.SaveChanges();
         }
     }
 }

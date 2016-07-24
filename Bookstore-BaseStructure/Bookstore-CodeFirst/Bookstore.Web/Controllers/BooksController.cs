@@ -1,34 +1,162 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Http;
-using Bookstore.Web.DbContext;
-using Bookstore.Web.Models;
-using Newtonsoft.Json;
+﻿using System.Data.Entity;
+using Bookstore.Models;
+using Bookstore.Web.Models.DataTransferObjects;
 
 namespace Bookstore.Web.Controllers
 {
-    public class BooksController : ApiController
+    using System.Linq;
+    using System.Web.Http;
+
+    using Microsoft.Ajax.Utilities;
+
+    using DbContext;
+    using Models.BindingModels;
+
+    public class BooksController : BaseController
     {
         // GET
-        // api/Books
+        // api/books
         [HttpGet]
-        public IHttpActionResult Get()
+        [Route("api/books/search")]
+        public IHttpActionResult SearchBooks([FromUri]BookSearchBindingModel model)
         {
-            var context = new BookstoreDbContext();
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(this.ModelState);
+            }
 
-            var books = context.Books
-                .Select(x => new BookDTO()
+            var books = base.dbContext.Books
+                .Select(BookDto.Dto)
+                .AsQueryable();
+
+            if (!model.Title.IsNullOrWhiteSpace())
+            {
+                books = books.Where(x => x.Title.Contains(model.Title));
+            }
+
+            if (!model.Summary.IsNullOrWhiteSpace())
+            {
+                books = books.Where(x => x.Summary.Contains(model.Summary));
+            }
+
+            var booksResult = books.ToList();
+
+            return this.Ok(booksResult);
+        }
+
+        // GET
+        // api/books/{id}
+        [HttpGet]
+        [Route("api/books/{id:int}", Name = "GetBookDetails")]
+        public IHttpActionResult GetBookDetails(int id)
+        {
+            var book = base.dbContext.Books
+                .Select(BookDto.Dto)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (book == null)
+            {
+                return this.NotFound();
+            }
+
+            return this.Ok(book);
+        }
+
+        // POST
+        // api/books
+        [HttpPost]
+        public IHttpActionResult CreateBook([FromBody]BookCreateBindingModel model)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(this.ModelState);
+            }
+
+            var book = new Book()
+            {
+                Title = model.Title,
+                Author = model.Author,
+                Summary = model.Summary.IsNullOrWhiteSpace() ? model.Summary : null
+            };
+
+            base.dbContext.Books.Add(book);
+            base.dbContext.SaveChanges();
+
+            return this.CreatedAtRoute(
+                "GetBookDetails",
+                new
                 {
-                    Id = x.Id,
-                    Author = x.Author,
-                    Summary = x.Summary,
-                    Title = x.Title
-                }).ToList();
+                    Id = book.Id,
+                    Message = $"Book {book.Title} added",
+                },
+                book);
+        }
 
-            return this.Ok(books);
+        // DELETE
+        // api/books/{id:int}
+        [HttpDelete]
+        [Route("api/books/{id:int}")]
+        public IHttpActionResult DeleteBook(int id)
+        {
+            var book = base.dbContext.Books.FirstOrDefault(x => x.Id == id);
+
+            if (book == null)
+            {
+                return this.NotFound();
+            }
+
+            base.dbContext.Books.Remove(book);
+            base.dbContext.SaveChanges();
+
+            return Ok(new
+            {
+                Message = $"Book {book.Title} deleted"
+            });
+        }
+
+        // PATCH
+        // api/books/{id}
+        [HttpPatch]
+        [Route("api/books/{id:int}")]
+        public IHttpActionResult EditBook(int id, [FromBody]BookEditBindingModel model)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(this.ModelState);
+            }
+
+            var book = base.dbContext.Books.FirstOrDefault(x => x.Id == id);
+            if (book == null)
+            {
+                return this.NotFound();
+            }
+
+            if (model.Title != null)
+            {
+                book.Title = model.Title;
+            }
+
+            if (model.Summary != null)
+            {
+                book.Summary = model.Summary;
+            }
+
+            if (model.Author != null)
+            {
+                book.Author = model.Author;
+            }
+
+            var entry = base.dbContext.Entry(book);
+
+            entry.State = EntityState.Modified;
+            base.dbContext.SaveChanges();
+
+            return this.Ok(
+                new
+                {
+                    Message = $"Book {book.Title} updated"
+                }
+            );
         }
     }
 }

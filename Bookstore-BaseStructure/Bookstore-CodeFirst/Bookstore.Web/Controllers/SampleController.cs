@@ -93,7 +93,7 @@
         /// <returns>HttpResponseMessage</returns>
         [HttpGet]
         [Authorize]
-        [Route("api/sample/auth")] // Custom action name to avoid name conflicts
+        [Route("auth")] // Custom action name to avoid name conflicts
         public HttpResponseMessage GetWithAuthentication()
         {
             var result = new[]
