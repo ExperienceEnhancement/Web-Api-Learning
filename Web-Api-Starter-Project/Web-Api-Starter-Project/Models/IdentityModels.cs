@@ -16,6 +16,8 @@ namespace Web_Api_Starter_Project.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>

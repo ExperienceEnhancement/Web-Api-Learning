@@ -1,4 +1,6 @@
-﻿namespace Bookstore.Data.Data
+﻿using Bookstore.Models.Ads.Models;
+
+namespace Bookstore.Data.Data
 {
     using System;
     using System.Collections.Generic;
@@ -42,7 +44,12 @@
         public IRepository<Availability> Availabilities
         {
             get { return this.GetRepository<Availability>();  }
-        } 
+        }
+
+        public IRepository<UserSession> UserSessions
+        {
+            get { return this.GetRepository<UserSession>(); }
+        }
 
         public int SaveChanges()
         {

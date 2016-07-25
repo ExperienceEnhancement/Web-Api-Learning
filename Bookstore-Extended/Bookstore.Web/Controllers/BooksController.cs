@@ -1,4 +1,6 @@
-﻿namespace Bookstore.Web.Controllers
+﻿using Bookstore.Web.Attributes;
+
+namespace Bookstore.Web.Controllers
 {
     using System.Linq;
     using System.Web.Http;
@@ -20,6 +22,7 @@
         // api/books
         [HttpGet]
         [Route("api/books/search")]
+        [SessionAuthorize]
         public IHttpActionResult SearchBooks([FromUri]BookSearchBindingModel model)
         {
             if (!this.ModelState.IsValid)

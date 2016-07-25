@@ -25,8 +25,7 @@
 
             var books = base.dbContext.Books
                 .Include(x => x.Reviews)
-                .Select(BookDto.Dto)
-                .AsQueryable();
+                .Select(BookDto.Dto);
 
             if (model != null && !model.Title.IsNullOrWhiteSpace())
             {

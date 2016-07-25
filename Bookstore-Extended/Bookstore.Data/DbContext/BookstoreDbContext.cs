@@ -5,7 +5,8 @@
     using Microsoft.AspNet.Identity.EntityFramework;
 
     using Models;
-    
+    using Models.Ads.Models;
+
     public class BookstoreDbContext : IdentityDbContext<User>, IBookstoreDbContext
     {
         public BookstoreDbContext()
@@ -25,5 +26,7 @@
         public IDbSet<Publisher> Publishers { get; set; }
 
         public IDbSet<Availability> Availabilities { get; set; }
+
+        public IDbSet<UserSession> UserSessions { get; set; }
     }
 }

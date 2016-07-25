@@ -1,4 +1,9 @@
-﻿namespace Bookstore.Web.Controllers
+﻿using System.Net;
+using Bookstore.Data.Data;
+using Bookstore.Data.DbContext;
+using Bookstore.Web.UserSessionUtils;
+
+namespace Bookstore.Web.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -8,6 +13,7 @@
     using System.Threading.Tasks;
     using System.Web;
     using System.Web.Http;
+    using System.Web.Script.Serialization;
 
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.EntityFramework;
@@ -21,22 +27,29 @@
     using Providers;
     using Results;
 
+    using Microsoft.Owin.Testing;
+    using Models.BindingModels;
+
     [Authorize]
     [RoutePrefix("api/Account")]
-    public class AccountController : ApiController
+    public class AccountController : BaseController
     {
         private const string LocalLoginProvider = "Local";
         private ApplicationUserManager _userManager;
 
-        public AccountController()
+        public AccountController(IBookstoreData data): base(data)
         {
         }
 
         public AccountController(ApplicationUserManager userManager,
-            ISecureDataFormat<AuthenticationTicket> accessTokenFormat)
+            ISecureDataFormat<AuthenticationTicket> accessTokenFormat): base(new BookstoreData(new BookstoreDbContext()))
         {
             UserManager = userManager;
             AccessTokenFormat = accessTokenFormat;
+        }
+
+        public AccountController() : this(new BookstoreData(new BookstoreDbContext()))
+        {
         }
 
         public ApplicationUserManager UserManager
@@ -330,7 +343,7 @@
                 return BadRequest(ModelState);
             }
 
-            var user = new User() { UserName = model.Email, Email = model.Email };
+            var user = new User() { UserName = model.Username, Email = model.Email };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 
@@ -339,7 +352,58 @@
                 return GetErrorResult(result);
             }
 
-            return Ok();
+            // Auto login after registration (successful user registration should return access_token)
+            var loginResult = await this.LoginUser(new LoginUserBindingModel()
+            {
+                Username = model.Username,
+                Password = model.Password
+            });
+
+            return loginResult;
+        }
+
+        // POST api/Account/Login
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("Login")]
+        public async Task<IHttpActionResult> LoginUser(LoginUserBindingModel model)
+        {
+            if (model == null)
+            {
+                return this.BadRequest("Invalid user data");
+            }
+
+            // Invoke the "token" OWIN service to perform the login (POST /api/token)
+            // Use Microsoft.Owin.Testing.TestServer to perform in-memory HTTP POST request
+            var testServer = TestServer.Create<Startup>();
+            var requestParams = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("grant_type", "password"),
+                new KeyValuePair<string, string>("username", model.Username),
+                new KeyValuePair<string, string>("password", model.Password)
+            };
+
+            var requestParamsFormUrlEncoded = new FormUrlEncodedContent(requestParams);
+            var tokenServiceResponse = await testServer.HttpClient.PostAsync(
+                Startup.TokenEndpointPath, requestParamsFormUrlEncoded);
+
+            if (tokenServiceResponse.StatusCode == HttpStatusCode.OK)
+            {
+                // Sucessful login --> create user session in the database
+                var responseString = await tokenServiceResponse.Content.ReadAsStringAsync();
+                var jsSerializer = new JavaScriptSerializer();
+                var responseData =
+                    jsSerializer.Deserialize<Dictionary<string, string>>(responseString);
+                var authToken = responseData["access_token"];
+                var username = responseData["userName"];
+                var userSessionManager = new UserSessionManager();
+                userSessionManager.CreateUserSession(username, authToken);
+
+                // Cleanup: delete expired sessions from the database
+                userSessionManager.DeleteExpiredSessions();
+            }
+
+            return this.ResponseMessage(tokenServiceResponse);
         }
 
         // POST api/Account/RegisterExternal
