@@ -1,16 +1,14 @@
-﻿using System.Data.Entity;
-using Bookstore.Models;
-using Bookstore.Web.Models.DataTransferObjects;
-
-namespace Bookstore.Web.Controllers
+﻿namespace Bookstore.Web.Controllers
 {
     using System.Linq;
     using System.Web.Http;
+    using System.Data.Entity;
 
     using Microsoft.Ajax.Utilities;
 
-    using DbContext;
     using Models.BindingModels;
+    using Bookstore.Models;
+    using Models.DataTransferObjects;
 
     public class BooksController : BaseController
     {
@@ -26,15 +24,16 @@ namespace Bookstore.Web.Controllers
             }
 
             var books = base.dbContext.Books
+                .Include(x => x.Reviews)
                 .Select(BookDto.Dto)
                 .AsQueryable();
 
-            if (!model.Title.IsNullOrWhiteSpace())
+            if (model != null && !model.Title.IsNullOrWhiteSpace())
             {
                 books = books.Where(x => x.Title.Contains(model.Title));
             }
 
-            if (!model.Summary.IsNullOrWhiteSpace())
+            if (model != null && !model.Summary.IsNullOrWhiteSpace())
             {
                 books = books.Where(x => x.Summary.Contains(model.Summary));
             }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq.Expressions;
-using Bookstore.Models;
-
-namespace Bookstore.Web.Models.DataTransferObjects
+﻿namespace Bookstore.Web.Models.DataTransferObjects
 {
+    using System;
+    using System.Linq.Expressions;
+    using Bookstore.Models;
+
     public class ReviewDto
     {
         public string UserId { get; set; }

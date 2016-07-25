@@ -1,8 +1,8 @@
-﻿using System.Linq;
-
-namespace Bookstore.Data.Repositories
+﻿namespace Bookstore.Data.Repositories
 {
     using System.Data.Entity;
+
+    using System.Linq;
 
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {

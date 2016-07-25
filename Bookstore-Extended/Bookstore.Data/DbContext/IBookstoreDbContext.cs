@@ -1,8 +1,9 @@
-﻿using System.Data.Entity;
-using Bookstore.Models;
-
-namespace Bookstore.Data.DbContext
+﻿namespace Bookstore.Data.DbContext
 {
+    using System.Data.Entity;
+
+    using Models;
+
     public interface IBookstoreDbContext
     {
         IDbSet<User> Users { get; }

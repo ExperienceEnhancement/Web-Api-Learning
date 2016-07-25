@@ -1,6 +1,4 @@
-﻿
-
-namespace Bookstore.Data.DbContext
+﻿namespace Bookstore.Data.DbContext
 {
     using System.Data.Entity;
 

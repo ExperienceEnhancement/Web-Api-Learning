@@ -1,10 +1,11 @@
-﻿using System.Data.Entity;
-using Bookstore.Web.Migrations;
-
-namespace Bookstore.Web.DbContext
+﻿namespace Bookstore.Web.DbContext
 {
-    using Bookstore.Models;
+    using System.Data.Entity;
+
     using Microsoft.AspNet.Identity.EntityFramework;
+
+    using Migrations;
+    using Bookstore.Models;
 
     public class BookstoreDbContext : IdentityDbContext<User>
     {

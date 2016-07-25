@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace Bookstore.Models
+﻿namespace Bookstore.Models
 {
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
+    using System.Collections.Generic;
 
     public class Book
     {

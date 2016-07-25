@@ -5,10 +5,10 @@
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    using Bookstore.Models;
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.EntityFramework;
-   
+
+    using Bookstore.Models;
     using DbContext;
 
     public class BookstoreDbMigrationConfiguration

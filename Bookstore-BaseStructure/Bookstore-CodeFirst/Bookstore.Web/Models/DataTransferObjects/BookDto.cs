@@ -1,10 +1,9 @@
-﻿using System.Linq;
-
-namespace Bookstore.Web.Models.DataTransferObjects
+﻿namespace Bookstore.Web.Models.DataTransferObjects
 {
     using System;
     using System.Linq.Expressions;
     using System.Collections.Generic;
+    using System.Linq;
 
     using Bookstore.Models;
 

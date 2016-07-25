@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json.Serialization;
-
-namespace Bookstore.Web
+﻿namespace Bookstore.Web
 {
     using System.Web.Http;
     using System.Web.Mvc;
     using System.Web.Optimization;
     using System.Web.Routing;
+
+    using Newtonsoft.Json.Serialization;
 
     public class WebApiApplication : System.Web.HttpApplication
     {

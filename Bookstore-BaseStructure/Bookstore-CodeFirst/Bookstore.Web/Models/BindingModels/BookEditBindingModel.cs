@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Bookstore.Web.Models.BindingModels
+﻿namespace Bookstore.Web.Models.BindingModels
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class BookEditBindingModel
     {
         public string Title { get; set; }

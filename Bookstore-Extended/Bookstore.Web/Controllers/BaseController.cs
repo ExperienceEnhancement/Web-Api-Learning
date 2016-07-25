@@ -1,8 +1,8 @@
-﻿using Bookstore.Data.Data;
-
-namespace Bookstore.Web.Controllers
+﻿namespace Bookstore.Web.Controllers
 {
     using System.Web.Http;
+
+    using Data.Data;
 
     public class BaseController : ApiController
     {
