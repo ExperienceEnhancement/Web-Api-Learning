@@ -1,11 +1,16 @@
-﻿namespace Bookstore.Web.Models.DataTransferObjects
+﻿
+
+namespace Bookstore.Web.Models.DataTransferObjects
 {
     using System;
     using System.Linq.Expressions;
 
-    using Bookstore.Models;
+    using AutoMapper;
 
-    public class ReviewDto
+    using Bookstore.Models;
+    using Mappings;
+
+    public class ReviewDto: IMapFrom<Review>, IHaveCustomMappings
     {
         public string UserId { get; set; }
 
@@ -27,6 +32,12 @@
                     Rate = e.Rate
                 };
             }
+        }
+
+        public void CreateMappings(IConfiguration configuration)
+        {
+            configuration.CreateMap<Review, ReviewDto>()
+                .ForMember(x => x.UserName, cnf => cnf.MapFrom(x => x.User.UserName));
         }
     }
 }

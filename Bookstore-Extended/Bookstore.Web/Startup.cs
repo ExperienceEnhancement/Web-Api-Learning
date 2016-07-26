@@ -17,7 +17,15 @@ namespace Bookstore.Web
         public void Configuration(IAppBuilder app)
         {
             ConfigureAuth(app);
-            app.UseNinjectMiddleware(this.CreateKernel).UseNinjectWebApi(GlobalConfiguration.Configuration);
+            app.UseNinjectMiddleware(this.CreateKernel);
+
+            var webApiConfig = new HttpConfiguration();
+            webApiConfig.MapHttpAttributeRoutes();
+            webApiConfig.Routes.MapHttpRoute(
+            name: "DefaultApi",
+            routeTemplate: "api/{controller}/{id}",
+            defaults: new { id = RouteParameter.Optional });
+            app.UseNinjectWebApi(webApiConfig);
         }
 
         private IKernel CreateKernel()

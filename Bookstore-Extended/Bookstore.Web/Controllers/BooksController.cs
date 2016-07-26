@@ -1,4 +1,5 @@
-﻿using Bookstore.Web.Attributes;
+﻿using AutoMapper.QueryableExtensions;
+using Bookstore.Web.Attributes;
 
 namespace Bookstore.Web.Controllers
 {
@@ -22,7 +23,7 @@ namespace Bookstore.Web.Controllers
         // api/books
         [HttpGet]
         [Route("api/books/search")]
-        [SessionAuthorize]
+        //[SessionAuthorize]
         public IHttpActionResult SearchBooks([FromUri]BookSearchBindingModel model)
         {
             if (!this.ModelState.IsValid)
@@ -31,7 +32,7 @@ namespace Bookstore.Web.Controllers
             }
 
             var books = base.Data.Books.All()
-                .Select(BookDto.Dto);
+                .Project().To<BookDto>();
 
             if (model != null && !model.Title.IsNullOrWhiteSpace())
             {
@@ -55,7 +56,8 @@ namespace Bookstore.Web.Controllers
         public IHttpActionResult GetBookDetails(int id)
         {
             var book = base.Data.Books.All()
-                .Select(BookDto.Dto)
+                .Project()
+                .To<BookDto>()
                 .FirstOrDefault(x => x.Id == id);
 
             if (book == null)

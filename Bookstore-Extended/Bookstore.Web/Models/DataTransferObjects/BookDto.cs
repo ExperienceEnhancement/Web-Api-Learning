@@ -1,4 +1,7 @@
-﻿namespace Bookstore.Web.Models.DataTransferObjects
+﻿using AutoMapper;
+using Bookstore.Web.Mappings;
+
+namespace Bookstore.Web.Models.DataTransferObjects
 {
     using System;
     using System.Linq.Expressions;
@@ -7,7 +10,7 @@
 
     using Bookstore.Models;
 
-    public class BookDto
+    public class BookDto: IMapFrom<Book>, IHaveCustomMappings
     {
         public int Id { get; set; }
 
@@ -38,6 +41,12 @@
                     }).ToList()
                 };
             }
+        }
+
+        public void CreateMappings(IConfiguration configuration)
+        {
+            configuration.CreateMap<Book, BookDto>()
+                .ForMember(x => x.Reviews, cnf => cnf.MapFrom(x => x.Reviews));
         }
     }
 }
